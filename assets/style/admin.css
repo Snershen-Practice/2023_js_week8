@@ -748,11 +748,11 @@
 /*# sourceMappingURL=all.css.map */
 
 .orderStatus a.danger-color {
-  color: red;
+  color: rgb(168, 164, 164);
 }
 
 .orderStatus a.info-color {
-  color: blue;
+  color: rgb(20, 200, 26);
 }
 
 .orderPage-table ul {

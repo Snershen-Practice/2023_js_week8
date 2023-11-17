@@ -1,6 +1,7 @@
 import "../../style/all.css";
 import "../../style/admin.css";
 import { adminApi } from "../apis.js";
+import { Toast } from "../alert.js";
 
 const orderTable = document.querySelector(".orderPage-table");
 const discardAllBtn = document.querySelector(".discardAllBtn");
@@ -9,6 +10,7 @@ let orderData = [];
 
 const sectionTitle = document.querySelector(".section-title");
 const orderChartFilter = document.querySelector('select[data-form="orderChartFilter"]');
+const orderStatusBtn = document.querySelectorAll(".orderStatus a");
 
 //初始化
 function init() {
@@ -65,7 +67,7 @@ function renderOrder(data) {
     </td>
     <td>${timeFormat(order.createdAt)}</td>
     <td class="orderStatus">
-      <a href="#" class="${className}">${orderStatus}</a>
+      <a href="#" class="${className}" data-id=${order.id} data-btn="status">${orderStatus}</a>
     </td>
     <td>
       <input type="button" class="delSingleOrder-Btn" value="刪除" data-id=${order.id} data-btn="deleteItem"/>
@@ -89,6 +91,33 @@ function renderOrder(data) {
   ${str}</table>`;
 }
 
+//訂單 - 修改訂單狀態
+function editOrderStatus(e) {
+  let tempId = e.target.dataset.id;
+  let data = {
+    data: {
+      id: tempId,
+      paid: true,
+    },
+  };
+
+  if (e.target.textContent === "已付款") {
+    data.data.paid = false;
+  } else {
+    data.data.paid = true;
+  }
+
+  adminApi.putOrder(data).then((res) => {
+    Toast.fire({
+      icon: "success",
+      title: "已修改訂單狀態",
+    });
+
+    orderData = res.data.orders;
+    renderOrder(orderData);
+  });
+}
+
 //訂單 - 刪除單一訂單
 function deleteOrder(e) {
   let tempItemId = e.target.dataset.id;
@@ -97,6 +126,10 @@ function deleteOrder(e) {
   });
 
   adminApi.delOrder(tempItemId).then((res) => {
+    Toast.fire({
+      icon: "success",
+      title: "已刪除訂單",
+    });
     orderData = res.data.orders;
     renderOrder(orderData);
     renderChartData("title");
@@ -117,7 +150,6 @@ function renderChartData(type) {
   const productItem = {};
   orderData.forEach((order) => {
     order.products.forEach((product) => {
-      console.log(product[type]);
       if (!productItem[product[type]]) {
         productItem[product[type]] = 1;
       } else if (productItem[product[type]]) {
@@ -153,12 +185,16 @@ function filterChart(e) {
 init();
 
 orderTable.addEventListener("click", (e) => {
+  e.preventDefault();
   if (e.target.dataset.btn === "deleteItem") {
     deleteOrder(e);
+  } else if (e.target.dataset.btn === "status") {
+    editOrderStatus(e);
   }
 });
 
 discardAllBtn.addEventListener("click", () => {
+  e.preventDefault();
   deleteAllOrder();
 });
 

@@ -1,6 +1,7 @@
 import "../../style/all.css";
 import "../../style/index.css";
 import { userApi } from "../apis.js";
+import { Toast } from "../alert.js";
 
 const productWrap = document.querySelector(".productWrap");
 const productSelect = document.querySelector(".productSelect");
@@ -15,25 +16,6 @@ let cartsData = [];
 
 // let originTotal = 0;
 let discountTotal = 0;
-
-const Toast = Swal.mixin({
-  toast: true,
-  position: "top-end",
-  showConfirmButton: false,
-  timerProgressBar: true,
-  timer: 2000,
-  showCloseButton: true,
-  showClass: {
-    popup: "animate__animated animate__fadeInRight",
-  },
-  hideClass: {
-    popup: "animate__animated animate__fadeOutRight",
-  },
-  didOpen: (toast) => {
-    toast.addEventListener("mouseenter", Swal.stopTimer);
-    toast.addEventListener("mouseleave", Swal.resumeTimer);
-  },
-});
 
 //初始化
 function init() {
@@ -182,10 +164,8 @@ function addCart(e) {
       })
       .then((res) => {
         buttons.forEach((button) => {
-          // if (button.dataset.id === e.target.dataset.id) {
           button.classList.remove("disabled");
           button.textContent = "加入購物車";
-          // }
         });
         Toast.fire({
           icon: "success",
